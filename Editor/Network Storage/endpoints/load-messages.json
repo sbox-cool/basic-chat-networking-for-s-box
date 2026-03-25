@@ -1,0 +1,23 @@
+{
+  "slug": "load-messages",
+  "name": "Load Messages",
+  "method": "GET",
+  "description": "Load the global chat message log",
+  "enabled": true,
+  "input": {},
+  "steps": [
+    {
+      "type": "read",
+      "collection": "chat_messages",
+      "key": "global",
+      "as": "chat"
+    }
+  ],
+  "response": {
+    "status": 200,
+    "body": {
+      "messages": "{{chat.messages}}",
+      "totalMessages": "{{chat.totalMessages}}"
+    }
+  }
+}

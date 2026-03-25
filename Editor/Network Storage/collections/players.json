@@ -1,0 +1,28 @@
+{
+  "name": "players",
+  "description": "",
+  "collectionType": "per-steamid",
+  "accessMode": "public",
+  "maxRecords": 1,
+  "allowRecordDelete": false,
+  "requireSaveVersion": false,
+  "webhookOnRateLimit": false,
+  "rateLimitAction": "reject",
+  "rateLimits": {
+    "mode": "none"
+  },
+  "schema": {
+    "currency": {
+      "type": "number",
+      "default": 0
+    },
+    "xp": {
+      "type": "number",
+      "default": 0
+    },
+    "level": {
+      "type": "number",
+      "default": 1
+    }
+  }
+}

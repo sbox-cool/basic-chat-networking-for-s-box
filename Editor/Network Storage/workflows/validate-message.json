@@ -1,0 +1,32 @@
+{
+  "id": "validate-message",
+  "name": "Validate Message",
+  "description": "Validates that a chat message is not empty and within length limits",
+  "condition": {
+    "field": "input.text",
+    "op": "neq",
+    "value": ""
+  },
+  "onFail": "error",
+  "errorMessage": "Message cannot be empty",
+  "steps": [
+    {
+      "type": "condition",
+      "field": "input.text",
+      "op": "neq",
+      "value": "",
+      "onFail": "error",
+      "errorMessage": "Message cannot be empty"
+    }
+  ],
+  "versions": {
+    "eodiz9": {
+      "condition": {
+        "field": "input.text",
+        "op": "neq",
+        "value": ""
+      },
+      "savedAt": "2026-03-24T22:27:16.376Z"
+    }
+  }
+}

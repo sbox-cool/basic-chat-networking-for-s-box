@@ -1,0 +1,38 @@
+{
+  "name": "chat_messages",
+  "description": "Global chat message log for all players",
+  "collectionType": "global",
+  "accessMode": "public",
+  "maxRecords": 1000,
+  "allowRecordDelete": false,
+  "requireSaveVersion": false,
+  "rateLimits": { "mode": "none" },
+  "rateLimitAction": "reject",
+  "webhookOnRateLimit": false,
+  "schema": {
+    "messages": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string" },
+          "timestamp": { "type": "number" },
+          "displayName": { "type": "string" },
+          "steamId": { "type": "string" }
+        }
+      }
+    },
+    "totalMessages": { "type": "number", "default": 0 }
+  },
+  "constants": [
+    {
+      "group": "chat",
+      "values": {
+        "max_message_length": 200,
+        "max_stored_messages": 500
+      }
+    }
+  ],
+  "tables": []
+}

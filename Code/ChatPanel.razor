@@ -1,0 +1,188 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using System;
+@inherits PanelComponent
+
+<root>
+	<div class="chat-container">
+		<div class="chat-header">
+			<span>Chat</span>
+			@if ( ChatManager.Instance is not null )
+			{
+				var secs = (int)MathF.Ceiling( ChatManager.Instance.SecondsUntilSync );
+				<span class="chat-sync">sync in @(secs)s</span>
+			}
+		</div>
+
+		<div class="chat-messages" @ref="MessageList">
+			@if ( ChatManager.Instance is not null )
+			{
+				@foreach ( var msg in ChatManager.Instance.Messages )
+				{
+					<div class="chat-message">
+						<span class="chat-name">@msg.DisplayName</span>
+						<span class="chat-text">@msg.Text</span>
+					</div>
+				}
+			}
+		</div>
+
+		<div class="chat-input-row">
+			<TextEntry class="chat-input" @ref="InputField" />
+			<div class="chat-send" onmousedown=@OnSendClicked>Send</div>
+		</div>
+	</div>
+</root>
+
+@code
+{
+	public Panel MessageList { get; set; }
+	public TextEntry InputField { get; set; }
+	private bool _needsFocus = true;
+
+	protected override void OnUpdate()
+	{
+		// Ensure pointer events work and cursor is visible
+		Panel.Style.PointerEvents = PointerEvents.All;
+		Panel.Style.Cursor = "default";
+
+		// Auto-focus on first frame
+		if ( _needsFocus && InputField is not null )
+		{
+			InputField.Focus();
+			_needsFocus = false;
+		}
+
+		// Enter key sends message
+		if ( Input.Pressed( "Chat" ) )
+		{
+			Submit();
+		}
+	}
+
+	private void OnSendClicked()
+	{
+		Log.Info( $"[Chat] Send clicked" );
+		Submit();
+	}
+
+	private void Submit()
+	{
+		var text = InputField?.Text ?? "";
+		Log.Info( $"[Chat] Submit, text='{text}'" );
+		if ( string.IsNullOrWhiteSpace( text ) ) return;
+		if ( ChatManager.Instance is null ) return;
+
+		_ = ChatManager.Instance.SendMessage( text );
+		InputField.Text = "";
+		_needsFocus = true;
+	}
+
+	protected override int BuildHash()
+	{
+		var count = ChatManager.Instance?.Messages.Count ?? 0;
+		var sending = ChatManager.Instance?.IsSending ?? false;
+		var text = InputField?.Text ?? "";
+		var syncSecs = (int)MathF.Ceiling( ChatManager.Instance?.SecondsUntilSync ?? 0 );
+		return System.HashCode.Combine( count, sending, text, syncSecs );
+	}
+}
+
+<style>
+	.chat-container {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 420px;
+		height: 340px;
+		background-color: rgba(0, 0, 0, 0.75);
+		border-radius: 8px;
+		display: flex;
+		flex-direction: column;
+		font-family: Consolas;
+		color: white;
+		overflow: hidden;
+		pointer-events: all;
+	}
+
+	.chat-header {
+		padding: 8px 12px;
+		font-size: 14px;
+		font-weight: bold;
+		background-color: rgba(255, 255, 255, 0.08);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.chat-sync {
+		font-size: 11px;
+		font-weight: normal;
+		color: rgba(255, 255, 255, 0.4);
+	}
+
+	.chat-messages {
+		flex-grow: 1;
+		overflow-y: scroll;
+		padding: 8px 12px;
+		gap: 4px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.chat-message {
+		font-size: 13px;
+		word-break: break-all;
+	}
+
+	.chat-name {
+		color: #5dade2;
+		font-weight: bold;
+		margin-right: 6px;
+	}
+
+	.chat-name::after {
+		content: ":";
+	}
+
+	.chat-text {
+		color: #eee;
+	}
+
+	.chat-input-row {
+		display: flex;
+		flex-direction: row;
+		padding: 6px;
+		gap: 6px;
+		background-color: rgba(255, 255, 255, 0.05);
+	}
+
+	.chat-input {
+		flex-grow: 1;
+		padding: 6px 10px;
+		font-size: 13px;
+		background-color: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 4px;
+		color: white;
+		pointer-events: all;
+	}
+
+	.chat-send {
+		padding: 6px 14px;
+		font-size: 13px;
+		background-color: #2980b9;
+		border: none;
+		border-radius: 4px;
+		color: white;
+		cursor: pointer;
+		pointer-events: all;
+	}
+
+	.chat-send:hover {
+		background-color: #3498db;
+	}
+</style>

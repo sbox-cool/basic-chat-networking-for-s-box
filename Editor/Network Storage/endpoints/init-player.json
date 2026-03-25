@@ -1,0 +1,38 @@
+{
+  "slug": "init-player",
+  "name": "init player",
+  "method": "POST",
+  "description": "Initialize a new player with default values",
+  "enabled": true,
+  "input": {},
+  "steps": [
+    {
+      "type": "read",
+      "collection": "players",
+      "key": "{{steamId}}",
+      "as": "player"
+    },
+    {
+      "type": "condition",
+      "field": "player",
+      "operator": "is_null",
+      "onFail": "return"
+    },
+    {
+      "type": "write",
+      "collection": "players",
+      "key": "{{steamId}}",
+      "data": {
+        "currency": 0,
+        "xp": 0,
+        "level": 1
+      }
+    }
+  ],
+  "response": {
+    "status": 200,
+    "body": {
+      "ok": true
+    }
+  }
+}

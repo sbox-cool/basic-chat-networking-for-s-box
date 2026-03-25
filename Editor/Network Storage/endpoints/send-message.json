@@ -1,0 +1,60 @@
+{
+  "slug": "send-message",
+  "name": "Send Message",
+  "method": "POST",
+  "description": "Send a chat message and store it in the global chat log",
+  "enabled": true,
+  "input": {
+    "text": { "type": "string", "required": true },
+    "displayName": { "type": "string", "required": true }
+  },
+  "steps": [
+    {
+      "id": "read_chat",
+      "type": "read",
+      "collection": "chat_messages",
+      "key": "global",
+      "as": "chat"
+    },
+    {
+      "id": "validate_message",
+      "type": "condition",
+      "check": {
+        "field": "input.text",
+        "op": "!=",
+        "value": ""
+      },
+      "onFail": {
+        "status": 400,
+        "error": "EMPTY_MESSAGE",
+        "message": "Message cannot be empty"
+      }
+    },
+    {
+      "type": "write",
+      "collection": "chat_messages",
+      "key": "global",
+      "ops": [
+        {
+          "op": "push",
+          "path": "messages",
+          "value": {
+            "text": "{{input.text}}",
+            "timestamp": "{{now}}",
+            "displayName": "{{input.displayName}}",
+            "steamId": "{{steamId}}"
+          }
+        },
+        {
+          "op": "inc",
+          "path": "totalMessages",
+          "value": 1
+        }
+      ]
+    }
+  ],
+  "response": {
+    "status": 200,
+    "body": { "ok": true, "totalMessages": "{{chat.totalMessages}}" }
+  }
+}
